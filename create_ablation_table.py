@@ -81,7 +81,6 @@ pivoted = pivoted.sort_values(
     ascending=[True, True, True, True]
 ).reset_index(drop=True)
 
-# TODO: Keep num_params in the print.
 pd.set_option('display.max_rows', None)  # Show all rows
 print("=== Regression Results ===")
 print(pivoted.to_string(index=False))
