@@ -54,6 +54,14 @@ pivoted_sem = agg.pivot(
     values="metric_sem"
 ).reset_index()
 
+# Add num_params back to the pivoted dataframe by merging with agg data
+# Since num_params should be the same for all datasets with the same configuration,
+# we can get it from the first occurrence for each group
+# We need to be careful with NaN values in lin_dim - handle them separately
+index_cols = [c for c in group_cols if c != "dataset"]
+num_params_mapping = agg.groupby(index_cols, dropna=False)["num_params"].first().reset_index()
+pivoted = pivoted.merge(num_params_mapping, on=index_cols, how="left")
+
 # Sort by model type
 model_order = [
     "tt", "tt_type1", "tt_lin", "tt_lin_type1",
