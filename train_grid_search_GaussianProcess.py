@@ -74,15 +74,15 @@ class GaussianProcess:
     """
     A unified wrapper for Gaussian Processes that handles both regression and classification tasks.
     """
-    def __init__(self, task='regression', kernel=None, alpha=1e-10):
+    def __init__(self, task='regression', kernel=None, alpha=1e-10, seed=42):
         self.task = task
         self.kernel = kernel
         self.alpha = alpha
 
         if self.task == 'regression':
-            self.model = GaussianProcessRegressor(kernel=kernel, alpha=alpha, random_state=42)
+            self.model = GaussianProcessRegressor(kernel=kernel, alpha=alpha, random_state=seed)
         elif self.task == 'classification':
-            self.model = GaussianProcessClassifier(kernel=kernel, random_state=42)
+            self.model = GaussianProcessClassifier(kernel=kernel, random_state=seed)
         else:
             raise ValueError(f"Unknown task: {task}")
 
@@ -148,7 +148,7 @@ def train_model(args, data=None, test=False):
     return report_dict
 
 if __name__ == '__main__':
-    skip_grid_search = True  # Set to True to skip grid search and load from CSV
+    skip_grid_search = False  # Set to True to skip grid search and load from CSV
 
     args = DotDict()
     args.device = 'cuda'
@@ -157,46 +157,56 @@ if __name__ == '__main__':
     args.model_type = 'gp'
 
     # Hyperparameter grids - GP specific
-    alphas = [1e-6]
+    alphas = [None]
 
     def create_kernels(n_features):
         kernels = []
         kernel_names = []
 
-        # Base kernels with scalar length scales
-        base_kernels_scalar = [
-            (C(1.0) * RBF(), 'RBF'),
-            (C(1.0) * Matern(nu=2.5), 'Matern25'),
-            (DotProduct(), 'DotProduct'),
-            (C(1.0) * RBF() + DotProduct(), 'RBF_plus_DotProduct')
-        ]
+        # DotProduct + WhiteKernel
+        kernels.append(DotProduct() + WhiteKernel())
+        kernel_names.append('DotProduct_plus_WhiteKernel')
+        # RBF + WhiteKernel
+        kernels.append(C(1.0) * RBF(length_scale=[1.0] * n_features) + WhiteKernel())
+        kernel_names.append('RBF_ARD_plus_WhiteKernel')
+        # DotProduct + RBF + WhiteKernel
+        kernels.append(C(1.0) * RBF(length_scale=[1.0] * n_features) + DotProduct() + WhiteKernel())
+        kernel_names.append('RBF_ARD_plus_DotProduct_plus_WhiteKernel')
 
-        # Base kernels with array length scales (ARD)
-        base_kernels_ard = [
-            (C(1.0) * RBF(length_scale=[1.0] * n_features), 'RBF_ARD'),
-            (C(1.0) * Matern(nu=2.5, length_scale=[1.0] * n_features), 'Matern25_ARD'),
-            (C(1.0) * RBF(length_scale=[1.0] * n_features) + DotProduct(), 'RBF_ARD_plus_DotProduct')
-        ]
+        # # Base kernels with scalar length scales
+        # base_kernels_scalar = [
+        #     (C(1.0) * RBF(), 'RBF'),
+        #     (C(1.0) * Matern(nu=2.5), 'Matern25'),
+        #     (DotProduct(), 'DotProduct'),
+        #     (C(1.0) * RBF() + DotProduct(), 'RBF_plus_DotProduct')
+        # ]
 
-        # 1. Base kernels with scalar hyperparameters
-        for kernel, name in base_kernels_scalar:
-            kernels.append(kernel)
-            kernel_names.append(name)
+        # # Base kernels with array length scales (ARD)
+        # base_kernels_ard = [
+        #     (C(1.0) * RBF(length_scale=[1.0] * n_features), 'RBF_ARD'),
+        #     (C(1.0) * Matern(nu=2.5, length_scale=[1.0] * n_features), 'Matern25_ARD'),
+        #     (C(1.0) * RBF(length_scale=[1.0] * n_features) + DotProduct(), 'RBF_ARD_plus_DotProduct')
+        # ]
 
-        # 2. Base kernels with array hyperparameters (ARD)
-        for kernel, name in base_kernels_ard:
-            kernels.append(kernel)
-            kernel_names.append(name)
+        # # 1. Base kernels with scalar hyperparameters
+        # for kernel, name in base_kernels_scalar:
+        #     kernels.append(kernel)
+        #     kernel_names.append(name)
 
-        # 3. Base kernels with scalar hyperparameters + WhiteKernel
-        for kernel, name in base_kernels_scalar:
-            kernels.append(kernel + WhiteKernel())
-            kernel_names.append(f'{name}_WhiteKernel')
+        # # 2. Base kernels with array hyperparameters (ARD)
+        # for kernel, name in base_kernels_ard:
+        #     kernels.append(kernel)
+        #     kernel_names.append(name)
 
-        # 4. Base kernels with array hyperparameters + WhiteKernel
-        for kernel, name in base_kernels_ard:
-            kernels.append(kernel + WhiteKernel())
-            kernel_names.append(f'{name}_WhiteKernel')
+        # # 3. Base kernels with scalar hyperparameters + WhiteKernel
+        # for kernel, name in base_kernels_scalar:
+        #     kernels.append(kernel + WhiteKernel())
+        #     kernel_names.append(f'{name}_WhiteKernel')
+
+        # # 4. Base kernels with array hyperparameters + WhiteKernel
+        # for kernel, name in base_kernels_ard:
+        #     kernels.append(kernel + WhiteKernel())
+        #     kernel_names.append(f'{name}_WhiteKernel')
 
         return kernels, kernel_names
 
@@ -276,7 +286,7 @@ if __name__ == '__main__':
             df.to_csv(f'./results/{dataset}_ablation_results_{args.model_type}.csv', index=False)
 
         # Aggregate across seeds
-        group_by_cols = ['kernel_name', 'alpha']
+        group_by_cols = ['kernel_name']
         df_agg = df.groupby(group_by_cols).agg({'val_rmse': 'mean', 'val_accuracy': 'mean'}).reset_index()
 
         if task == 'regression':
@@ -286,7 +296,7 @@ if __name__ == '__main__':
 
         # Reconstruct best setting and evaluate on test set multiple times
         best_kernel_name = best_row['kernel_name']
-        best_alpha = best_row['alpha']
+        best_alpha = np.nan
 
         # Find the corresponding kernel object
         best_kernel_idx = kernel_names.index(best_kernel_name)
