@@ -8,6 +8,10 @@ from models.tensor_train import TensorTrainRegressor
 from tensor.bregman import AutogradLoss, XEAutogradBregman
 from sklearn.metrics import accuracy_score, root_mean_squared_error, r2_score
 
+seeds = [2582264110, 1011906602, 1729841207, 3653141251, 826749499, 1399498030, 358916519, 328531638, 787755760, 4192420569]
+
+test_seeds = [836578142, 895435625, 2631647123, 2487125586, 3323088614, 3313309148, 3300558450, 4053540165, 2318036890, 4234260150]
+
 def evaluate_model(model, X, y_true, metric='accuracy'):
     y_pred = model.predict(X)
     if metric == 'accuracy':

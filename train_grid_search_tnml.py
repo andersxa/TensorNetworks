@@ -5,6 +5,7 @@ torch.set_default_dtype(torch.float64)
 from load_ucirepo import get_ucidata
 from tensor.bregman import AutogradLoss, XEAutogradBregman
 from sklearn.metrics import accuracy_score, root_mean_squared_error, r2_score
+from train_grid_search import seeds, test_seeds
 from datetime import datetime
 from dotdict import DotDict
 torch.set_default_dtype(torch.float64)
@@ -13,26 +14,26 @@ import pandas as pd
 from models.tnml import TNMLRegressor
 
 datasets = [
-    # ('adult', 2, 'classification'),
-    # ('iris', 53, 'classification'),
-    # ('hearth', 45, 'classification'),
-    # ('winequalityc', 186, 'classification'),
-    # ('breast', 17, 'classification'),
-    # ('bank', 222, 'classification'),
-    # ('wine', 109, 'classification'),
-    # ('car_evaluation', 19, 'classification'),
-    # ('student_dropout', 697, 'classification'),
-    # ('mushrooms', 73, 'classification'),
-    # ('student_perf', 320, 'regression'),
-    # ('abalone', 1, 'regression'),
-    # ('obesity', 544, 'regression'),
-    # ('bike', 275, 'regression'),
-    # ('realstate', 477, 'regression'),
-    # ('energy_efficiency', 242, 'regression'),
-    # ('concrete', 165, 'regression'),
-    # ('ai4i', 601, 'regression'),
+    ('adult', 2, 'classification'),
+    ('iris', 53, 'classification'),
+    ('hearth', 45, 'classification'),
+    ('winequalityc', 186, 'classification'),
+    ('breast', 17, 'classification'),
+    ('bank', 222, 'classification'),
+    ('wine', 109, 'classification'),
+    ('car_evaluation', 19, 'classification'),
+    ('student_dropout', 697, 'classification'),
+    ('mushrooms', 73, 'classification'),
+    ('student_perf', 320, 'regression'),
+    ('abalone', 1, 'regression'),
+    ('obesity', 544, 'regression'),
+    ('bike', 275, 'regression'),
+    ('realstate', 477, 'regression'),
+    ('energy_efficiency', 242, 'regression'),
+    ('concrete', 165, 'regression'),
+    ('ai4i', 601, 'regression'),
     # ('appliances', 374, 'regression'),
-    # ('popularity', 332, 'regression'),
+    ('popularity', 332, 'regression'),
     ('seoulBike', 560, 'regression'),
 ]
 
@@ -150,7 +151,7 @@ def train_model(args, data=None, test=False):
     return report_dict
 
 if __name__ == '__main__':
-    skip_grid_search = True  # Set to True to skip grid search and load from CSV
+    skip_grid_search = False# Set to True to skip grid search and load from CSV
 
     args = DotDict()
     args.device = 'cuda'
@@ -168,8 +169,7 @@ if __name__ == '__main__':
     args.method = 'ridge_cholesky'
     args.lin_dim = None
 
-    seeds = list(range(42, 42+5))
-    for basis_func in ['polynomial']: #'sin-cos', 
+    for basis_func in ['polynomial', 'sin-cos']: #'sin-cos', 
         is_poly = basis_func == 'polynomial'
         degrees = [1,2,3,4,5,6] if is_poly else [np.nan]
         args.model_type = f'tnml_{basis_func}'
@@ -222,7 +222,7 @@ if __name__ == '__main__':
                 if len(df) == 0:
                     exit(0)
 
-                df.to_csv(f'./results/{dataset}_ablation_results_{args.model_type}.csv', index=False)
+                df.to_csv(f'/zhome/6b/e/212868/Desktop/code/TensorNetworksFork/results/{dataset}_ablation_results_{args.model_type}.csv', index=False)
 
             # Take the best one and run it on the test set
             # First we aggregate over seeds to find the best (N, r) pair
@@ -240,7 +240,6 @@ if __name__ == '__main__':
             args.r = int(best_row['r'])
 
             # Run 5 test runs with different seeds
-            test_seeds = [1337, 2024, 3141, 4242, 5555]
             for test_seed in test_seeds:
                 args.seed = test_seed
                 print(f"Final evaluation on test set for {dataset} with seed {test_seed}", file=sys.stdout, flush=True)
@@ -248,5 +247,5 @@ if __name__ == '__main__':
                 print(f"Final Result: {result}", file=sys.stdout, flush=True)
 
                 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-                with open(f'./results/test_results_{args.model_type}.csv', 'a+') as f:
+                with open(f'/zhome/6b/e/212868/Desktop/code/TensorNetworksFork/results/test_results_{args.model_type}.csv', 'a+') as f:
                     f.write(f"{timestamp},{args.model_type},{dataset},{args.N},{args.r},{np.nan},{result['test_rmse']},{result['test_r2']},{result['test_accuracy']},{result['num_params']},{result['converged_epoch']}\n")

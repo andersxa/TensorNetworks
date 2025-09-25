@@ -144,13 +144,13 @@ if __name__ == '__main__':
     args.data_path = "/work3/aveno/MNIST/data"  # Specify path to data
 
     # CPD hyperparameters
-    Ns = [3] #[2, 3, 4, 5, 6]
+    Ns = [2] #[2, 3, 4, 5, 6]
     rs = [4] #[4, 8, 12, 16, 64, 144, 256]
     args.num_swipes = 100
     args.lr = 1.0
     args.eps_start = 5.0
     args.eps_decay = 0.25
-    args.batch_size = 1024
+    args.batch_size = 128
     args.verbose = 1
     args.method = 'ridge_cholesky'
     args.lin_dim = None

@@ -1,0 +1,107 @@
+Running DATASET=FashionMNIST SEED=46 N=4 R=16 CB=8 MODEL_TYPE=tt_type1
+Starting training with the following configuration: dataset:
+FashionMNIST data_path: /work3/aveno/FashionMNIST/data model_type:
+tt_type1 N: 4 r: 16 CB: 8 seed: 46 kernel_size: 4 kernel_stride: 4
+num_swipes: 5 eps: 5.0 eps_decay: 0.25 early_stopping: 10 abs_err:
+0.0001 rel_err: 0.001 validation_split: 0.1 verbose: 1 results_path:
+/zhome/6b/e/212868/Desktop/code/TensorNetworksFork results_filename:
+bogFashion.csv results_file:
+/zhome/6b/e/212868/Desktop/code/TensorNetworksFork/bogFashion.csv Num
+params: 65459 Epoch 1: Val loss 0.9512 (dif
+q
+2: Val loss 0.4798 (diff: 0.4713).  Epoch 3: Val loss 0.4610 (diff:
+0.0188).  Epoch 4: Val loss 0.2623 (diff: 0.1987).  Epoch 8: Val loss
+0.2495 (diff: 0.0128).  Epoch 9: Val loss 0.2315 (diff: 0.0180).
+Epoch 10: Val loss 0.1982 (diff: 0.0333).  Converged with best loss:
+0.1982 Converged (left pass) Test Accuracy: 79.28% Results appended to
+existing file:
+/zhome/6b/e/212868/Desktop/code/TensorNetworksFork/bogFashion.csv
+Training completed successfully!  finished
+
+------------------------------------------------------------
+Sender: LSF System <lsfadmin@hpc.dtu.dk>
+Subject: Job 26196371: <FashionMNIST> in cluster <dcc> Done
+
+Job <FashionMNIST> was submitted from host <hpclogin1> by user <nicci> in cluster <dcc> at Mon Sep 22 15:28:29 2025
+Job was executed on host(s) <8*n-62-12-21>, in queue <gpua100>, as user <nicci> in cluster <dcc> at Mon Sep 22 15:41:53 2025
+</zhome/6b/e/212868> was used as the home directory.
+</zhome/6b/e/212868/Desktop/code/TensorNetworksFork> was used as the working directory.
+Started at Mon Sep 22 15:41:53 2025
+Terminated at Mon Sep 22 15:44:32 2025
+Results reported at Mon Sep 22 15:44:32 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/sh
+#BSUB -q gpua100
+#BSUB -J FashionMNIST
+#BSUB -W 1:00
+#BSUB -n 8
+#BSUB -gpu "num=1:mode=exclusive_process"
+#BSUB -R "rusage[mem=16GB]"
+#BSUB -R "span[hosts=1]"
+#BSUB nicci@dtu.dk
+
+# module load cuda/12.4
+# module load gcc/13.3.0-binutils-2.42
+
+export MYHOME='/zhome/6b/e/212868'
+source "$MYHOME/tnregr/bin/activate"
+export TNDIR="$MYHOME/Desktop/code/TensorNetworksFork"
+export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:2048
+export DATA_PATH=/work3/aveno/$DATASET/data
+export RESULTS_FILENAME=bogFashion.csv
+export VERBOSE=1
+export TNDIR=/zhome/6b/e/212868/Desktop/code/TensorNetworksFork
+# Parameter sweep
+# Set your starting point
+START_SEED=43
+START_N=3
+START_R=8
+START_CB=12
+START_MODEL_TYPE="tt_type1" # Leave empty to skip from any MODEL_TYPE
+
+START_REACHED=true
+
+for DATASET in FashionMNIST; do
+    for SEED in 46; do
+        for N in 4 ; do
+            for R in 16; do
+                for CB in 8; do
+                    for MODEL_TYPE in tt_type1; do
+                        # Check if we've reached the starting point
+                        if [[ "$START_REACHED" == "false" ]]; then
+                            if [[ $SEED -eq $START_SEED && \
+                                  $N -eq $START_N && \
+                                  $R -eq $START_R && \
+                                  $CB -eq $START_CB && \
+                                  ($START_MODEL_TYPE == "" || "$MODEL_TYPE" == "$START_MODEL_TYPE") ]]; then
+                                START_REACHED=true
+                                continue  # Skip this iteration and start from next
+                            else
+                                continue  # Skip this iteration
+                            fi
+                        fi
+
+(... more ...)
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   79.69 sec.
+    Max Memory :                                 866 MB
+    Average Memory :                             665.50 MB
+    Total Requested Memory :                     131072.00 MB
+    Delta Memory :                               130206.00 MB
+    Max Swap :                                   -
+    Max Processes :                              4
+    Max Threads :                                9
+    Run time :                                   159 sec.
+    Turnaround time :                            963 sec.
+
+The output (if any) is above this job summary.
+

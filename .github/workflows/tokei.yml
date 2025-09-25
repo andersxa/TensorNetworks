@@ -2,8 +2,9 @@
 name: Update Tokei in README
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 23 * * *'
 
 jobs:
   update-readme:

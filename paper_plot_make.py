@@ -1,7 +1,9 @@
 #%%
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
 
-# Load all again
 parameters = [
         # {'degree': 3, 'max_degree': 8, 'd': 1, 'rank': 6, 'cpd_rank': 100},
         # {'degree': 3, 'max_degree': 8, 'd': 3, 'rank': 12, 'cpd_rank': 100},
@@ -29,10 +31,6 @@ for params in parameters:
     df['Model'] = df['name']
     df['Model Degree'] = df['degree']
     all_dfs.append(df)
-
-#%%
-import seaborn as sns
-import matplotlib.pyplot as plt
 for params, df in zip(parameters, all_dfs):
     plt.figure(figsize=(8, 6))
     sns.color_palette("tab10")
@@ -48,7 +46,9 @@ for params, df in zip(parameters, all_dfs):
     )
 
     plt.title(f"RMSE for problems with dimension {params['d']} and polynomial degree {params['degree']}")
-    plt.ylabel("R-squared")
+    plt.ylabel("Validation Loss")
+    plt.tight_layout()
+    # plt.savefig('AFIG0.png')
     plt.tight_layout(pad=1.0)
     #plt.savefig(f"figs/ablation_d{params['d']}_deg{params['degree']}_rank{params['rank']}_cpdrank{params['cpd_rank']}.pdf", bbox_inches='tight', pad_inches=0)
 #%%
@@ -68,11 +68,7 @@ for params, df in zip(parameters, all_dfs):
     plt.ylabel("Time (seconds)")
     #Set y axis to log scale
     plt.tight_layout()
-    plt.show()
-# %%
-import seaborn as sns
-import matplotlib.pyplot as plt
-import numpy as np
+    # plt.savefig('AFIG1.png')
 for params, df in zip(parameters, all_dfs):
     df_N = df[df['N'] == df['N'].max()].copy()
     df_N['degree_diff'] = np.abs(df_N['best_degree'] - params['degree'])
@@ -83,5 +79,5 @@ for params, df in zip(parameters, all_dfs):
         y="degree_diff",
     )
     plt.tight_layout()
-    plt.show()
-# %%
+    # plt.savefig('AFIG2.png')
+print(all_dfs[0]['name'].unique())

@@ -32,6 +32,7 @@
       packages = [
         (python.withPackages (p:
           with p; [
+            seaborn
             matplotlib
             tqdm
             torch
