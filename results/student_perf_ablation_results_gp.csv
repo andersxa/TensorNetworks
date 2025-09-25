@@ -1,0 +1,15 @@
+dataset,kernel_name,alpha,val_rmse,val_r2,val_accuracy,num_params,model_type
+student_perf,RBF,1e-06,2.5383792013405517,-0.010966826254539042,,,gp
+student_perf,Matern25,1e-06,2.3599835076615947,0.12614004185741845,,,gp
+student_perf,DotProduct,1e-06,2.356428831107173,0.12877052643723363,,,gp
+student_perf,RBF_plus_DotProduct,1e-06,2.336924149051757,0.1431335541044253,,,gp
+student_perf,RBF_ARD,1e-06,2.766861267713482,-0.20115394334211079,,,gp
+student_perf,Matern25_ARD,1e-06,2.654354055875539,-0.10545637050008305,,,gp
+student_perf,RBF_ARD_plus_DotProduct,1e-06,2.4896701475663545,0.027459877140907696,,,gp
+student_perf,RBF_WhiteKernel,1e-06,2.2531989074168735,0.20343179492624996,,,gp
+student_perf,Matern25_WhiteKernel,1e-06,2.5363011989779243,-0.009312281052459515,,,gp
+student_perf,DotProduct_WhiteKernel,1e-06,2.336924145919945,0.14313355640107217,,,gp
+student_perf,RBF_plus_DotProduct_WhiteKernel,1e-06,2.3231342582859686,0.1532162365587637,,,gp
+student_perf,RBF_ARD_WhiteKernel,1e-06,2.5362926421480356,-0.009305470742289712,,,gp
+student_perf,Matern25_ARD_WhiteKernel,1e-06,2.408223241270335,0.09005029111046925,,,gp
+student_perf,RBF_ARD_plus_DotProduct_WhiteKernel,1e-06,2.454136739776167,0.055022609109556475,,,gp

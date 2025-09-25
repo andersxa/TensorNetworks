@@ -1,0 +1,15 @@
+dataset,kernel_name,alpha,val_rmse,val_r2,val_accuracy,num_params,model_type
+iris,RBF,1e-06,,,1.0,,gp
+iris,Matern25,1e-06,,,1.0,,gp
+iris,DotProduct,1e-06,,,0.9545454545454546,,gp
+iris,RBF_plus_DotProduct,1e-06,,,1.0,,gp
+iris,RBF_ARD,1e-06,,,1.0,,gp
+iris,Matern25_ARD,1e-06,,,1.0,,gp
+iris,RBF_ARD_plus_DotProduct,1e-06,,,1.0,,gp
+iris,RBF_WhiteKernel,1e-06,,,1.0,,gp
+iris,Matern25_WhiteKernel,1e-06,,,1.0,,gp
+iris,DotProduct_WhiteKernel,1e-06,,,0.9545454545454546,,gp
+iris,RBF_plus_DotProduct_WhiteKernel,1e-06,,,1.0,,gp
+iris,RBF_ARD_WhiteKernel,1e-06,,,1.0,,gp
+iris,Matern25_ARD_WhiteKernel,1e-06,,,1.0,,gp
+iris,RBF_ARD_plus_DotProduct_WhiteKernel,1e-06,,,1.0,,gp

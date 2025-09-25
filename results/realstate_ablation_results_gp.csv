@@ -1,0 +1,15 @@
+dataset,kernel_name,alpha,val_rmse,val_r2,val_accuracy,num_params,model_type
+realstate,RBF,1e-06,36.27759016786194,-6.888502187028874,,,gp
+realstate,Matern25,1e-06,36.27759016786194,-6.888502187028874,,,gp
+realstate,DotProduct,1e-06,9.778228829550656,0.4268898730267091,,,gp
+realstate,RBF_plus_DotProduct,1e-06,42.109321994522055,-9.628554102501358,,,gp
+realstate,RBF_ARD,1e-06,36.277590167861945,-6.888502187028876,,,gp
+realstate,Matern25_ARD,1e-06,36.277590167861945,-6.888502187028877,,,gp
+realstate,RBF_ARD_plus_DotProduct,1e-06,42.109321994522055,-9.628554102501358,,,gp
+realstate,RBF_WhiteKernel,1e-06,13.097624580645318,-0.028259583487248552,,,gp
+realstate,Matern25_WhiteKernel,1e-06,13.097622299419704,-0.028259225301398905,,,gp
+realstate,DotProduct_WhiteKernel,1e-06,9.664660246077343,0.4401252616333211,,,gp
+realstate,RBF_plus_DotProduct_WhiteKernel,1e-06,9.519100759815249,0.45686281440235255,,,gp
+realstate,RBF_ARD_WhiteKernel,1e-06,13.097625069942882,-0.028259660314144286,,,gp
+realstate,Matern25_ARD_WhiteKernel,1e-06,13.097622270713844,-0.028259220794158546,,,gp
+realstate,RBF_ARD_plus_DotProduct_WhiteKernel,1e-06,9.51910059923961,0.4568628327264783,,,gp

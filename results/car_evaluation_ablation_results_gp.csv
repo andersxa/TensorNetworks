@@ -1,0 +1,15 @@
+dataset,kernel_name,alpha,val_rmse,val_r2,val_accuracy,num_params,model_type
+car_evaluation,RBF,1e-06,,,0.9536679536679536,,gp
+car_evaluation,Matern25,1e-06,,,0.9498069498069498,,gp
+car_evaluation,DotProduct,1e-06,,,0.8648648648648649,,gp
+car_evaluation,RBF_plus_DotProduct,1e-06,,,0.972972972972973,,gp
+car_evaluation,RBF_ARD,1e-06,,,0.7953667953667953,,gp
+car_evaluation,Matern25_ARD,1e-06,,,0.833976833976834,,gp
+car_evaluation,RBF_ARD_plus_DotProduct,1e-06,,,0.9768339768339769,,gp
+car_evaluation,RBF_WhiteKernel,1e-06,,,0.9536679536679536,,gp
+car_evaluation,Matern25_WhiteKernel,1e-06,,,0.9034749034749034,,gp
+car_evaluation,DotProduct_WhiteKernel,1e-06,,,0.8648648648648649,,gp
+car_evaluation,RBF_plus_DotProduct_WhiteKernel,1e-06,,,0.9459459459459459,,gp
+car_evaluation,RBF_ARD_WhiteKernel,1e-06,,,0.7953667953667953,,gp
+car_evaluation,Matern25_ARD_WhiteKernel,1e-06,,,0.8301158301158301,,gp
+car_evaluation,RBF_ARD_plus_DotProduct_WhiteKernel,1e-06,,,0.9691119691119691,,gp

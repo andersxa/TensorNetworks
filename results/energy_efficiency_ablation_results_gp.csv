@@ -1,0 +1,15 @@
+dataset,kernel_name,alpha,val_rmse,val_r2,val_accuracy,num_params,model_type
+energy_efficiency,RBF,1e-06,1.161312745657313,0.9868057896458371,,,gp
+energy_efficiency,Matern25,1e-06,0.6428105363192455,0.9959574910323086,,,gp
+energy_efficiency,DotProduct,1e-06,3.1614880089864306,0.9022159329546429,,,gp
+energy_efficiency,RBF_plus_DotProduct,1e-06,3.2285819524479074,0.8980214933050888,,,gp
+energy_efficiency,RBF_ARD,1e-06,0.7705158200304479,0.9941917120514646,,,gp
+energy_efficiency,Matern25_ARD,1e-06,0.42664734634006224,0.998219167322629,,,gp
+energy_efficiency,RBF_ARD_plus_DotProduct,1e-06,0.9266594372107955,0.9915991094875451,,,gp
+energy_efficiency,RBF_WhiteKernel,1e-06,10.309350699028318,-0.03979481070598623,,,gp
+energy_efficiency,Matern25_WhiteKernel,1e-06,10.309345653387814,-0.039793792905800096,,,gp
+energy_efficiency,DotProduct_WhiteKernel,1e-06,3.2285817482775316,0.8980215062030048,,,gp
+energy_efficiency,RBF_plus_DotProduct_WhiteKernel,1e-06,3.228581859744738,0.8980214991613631,,,gp
+energy_efficiency,RBF_ARD_WhiteKernel,1e-06,4.653938583116245,0.7881022652193423,,,gp
+energy_efficiency,Matern25_ARD_WhiteKernel,1e-06,10.309292775928874,-0.0397831265619919,,,gp
+energy_efficiency,RBF_ARD_plus_DotProduct_WhiteKernel,1e-06,0.46266715234111905,0.9979057797570092,,,gp
