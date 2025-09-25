@@ -200,8 +200,7 @@ if __name__ == '__main__':
     args.dataset_name = 'mnist'  # Change to 'fashionmnist' to use FashionMNIST
     args.data_path = "/work3/aveno/MNIST/data"  # Specify path to data
 
-    rs = [int(os.getenv("R", "4"))]
-    args.model_type = os.getenv("MT", "sin-cos")
+    rs = [80]
     poly_degrees = [3] #[1,2,3,4,5,6]
     args.num_swipes = 1
     args.lr = 1.0

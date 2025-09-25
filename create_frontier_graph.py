@@ -77,6 +77,30 @@ fashion_cpd = [
     ('CPD', 150, 3532510, 87.92),
 ]
 
+# MNIST TNML:
+# 155720, 0.9815
+# 621192, 0.9755
+# 2478280, 0.9835
+# 9887432, 0.9814
+tnml_mnist = [
+    ('TNML', 10, 155720, 98.15),
+    ('TNML', 20, 621192, 97.55),
+    ('TNML', 40, 2478280, 98.35),
+    ('TNML', 80, 9887432, 98.14),
+]
+
+# Fashion MNIST TNML:
+# 155720, 0.8749
+# 621192, 0.8785
+# 2478280, 0.8800
+# 9887432, 0.8749
+tnml_fashion = [
+    ('TNML', 10, 155720, 87.49),
+    ('TNML', 20, 621192, 87.85),
+    ('TNML', 40, 2478280, 88.00),
+    ('TNML', 80, 9887432, 87.49),
+]
+
 fashion_mnist_df = pd.read_csv(fashion_mnist_csv)
 
 # Drop rows with "type_II" in model_type
@@ -109,6 +133,11 @@ cpd_params = [row[2] for row in cpd_mnist]
 cpd_acc = [row[3] for row in cpd_mnist]
 plt.plot(cpd_params, cpd_acc, 'o--', label='CPD')
 
+# Add TNML data points
+tnml_params = [row[2] for row in tnml_mnist]
+tnml_acc = [row[3] for row in tnml_mnist]
+plt.plot(tnml_params, tnml_acc, 'o--', label='TNML')
+
 plt.xscale('log')
 plt.xlabel('Number of Parameters')
 plt.ylabel('Test Accuracy (%)')
@@ -134,6 +163,11 @@ plt.errorbar(
 fashion_cpd_params = [row[2] for row in fashion_cpd]
 fashion_cpd_acc = [row[3] for row in fashion_cpd]
 plt.plot(fashion_cpd_params, fashion_cpd_acc, 'o--', label='CPD')
+
+# Add TNML data points for Fashion MNIST
+fashion_tnml_params = [row[2] for row in tnml_fashion]
+fashion_tnml_acc = [row[3] for row in tnml_fashion]
+plt.plot(fashion_tnml_params, fashion_tnml_acc, 'o--', label='TNML')
 
 plt.xscale('log')
 plt.xlabel('Number of Parameters')
