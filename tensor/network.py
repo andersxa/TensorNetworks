@@ -172,7 +172,7 @@ class TensorNetwork:
         self.right_stacks[node] = contracted
 
     @torch.no_grad()
-    def get_A_b(self, node, grad, hessian):
+    def get_A_b(self, node, grad, hessian, method=None):
         """Finds the update step for a given node"""
 
         # Determine broadcast
@@ -208,7 +208,10 @@ class TensorNetwork:
         einsum_b = f"{J_ein1},{d_loss_ein}->{J_out1}"
 
         # Compute einsum operations
-        A = torch.einsum(einsum_A, J.tensor.conj(), J.tensor, hessian)
+        if method is None:
+            A = torch.einsum(einsum_A, J.tensor.conj(), J.tensor, hessian)
+        else:
+            A = torch.randn((2,2,2,2))
         b = torch.einsum(einsum_b, J.tensor.conj(), grad)
 
         return A, b
@@ -292,8 +295,9 @@ class TensorNetwork:
         # Solve the system
         A_f = A.flatten(0, A.ndim//2-1).flatten(1, -1)
         b_f = b.flatten()
-
         scale = A_f.diag().abs().mean()
+        if scale == 0:
+            scale = 1
         A_f = A_f / scale
         b_f = b_f / scale
 
@@ -307,7 +311,6 @@ class TensorNetwork:
         elif method.lower().startswith('ridge_cholesky'):
             A_f = A_f + (2 * eps) * torch.eye(A_f.shape[-1], dtype=A_f.dtype, device=A_f.device)
             b_f = b_f + (2 * eps) * node.tensor.flatten()
-
             L = torch.linalg.cholesky(A_f)
             x = torch.cholesky_solve(-b_f.unsqueeze(-1), L)
             x = x.squeeze(-1)
@@ -315,6 +318,8 @@ class TensorNetwork:
             L = torch.linalg.cholesky(A_f)
             x = torch.cholesky_solve(-b_f.unsqueeze(-1), L)
             x = x.squeeze(-1)
+        elif method.lower() == 'gradient':
+            x = -b
         else:
             raise ValueError(f"Unknown method: {method}")
 
@@ -450,8 +455,10 @@ class TensorNetwork:
 
                     y_pred = self.forward(x_batch, to_tensor=True)
                     loss, d_loss, sqd_loss = loss_fn.forward(y_pred, y_batch)
-
-                    A, b_vec = self.get_A_b(node_l2r, d_loss, sqd_loss)
+                    if method == 'gradient':
+                        A, b_vec = self.get_A_b(node_l2r, d_loss, sqd_loss, method=method)
+                    else:
+                        A, b_vec = self.get_A_b(node_l2r, d_loss, sqd_loss)
 
                     if A_out is None:
                         A_out = A
@@ -459,6 +466,8 @@ class TensorNetwork:
                     else:
                         A_out.add_(A)
                         b_out.add_(b_vec)
+                    if method == 'gradient':
+                        node_l2r.update_node(b_vec, lr=lr, adaptive_step=adaptive_step, min_norm=min_norm, max_norm=max_norm)
 
                     total_loss += loss.mean().item()
                 if verbose > 1:
@@ -473,8 +482,8 @@ class TensorNetwork:
                     if verbose > 0:
                         print(f"Singular system for node {node_l2r.name if hasattr(node_l2r, 'name') else 'node'}")
                     return False
-
-                node_l2r.update_node(step_tensor, lr=lr, adaptive_step=adaptive_step, min_norm=min_norm, max_norm=max_norm)
+                if method != 'gradient':
+                    node_l2r.update_node(step_tensor, lr=lr, adaptive_step=adaptive_step, min_norm=min_norm, max_norm=max_norm)
                 if orthonormalize:
                     self.node_orthonormalize_left(node_l2r)
                 if update_or_reset_stack == 'reset':
@@ -1011,7 +1020,7 @@ class SumOfNetworks(TensorNetwork):
             out = out.tensor
         return out
 
-    def get_A_b(self, node, grad, hessian):
+    def get_A_b(self, node, grad, hessian, method=None):
         for net in self.networks:
             if node in net.nodes:
                 return net.get_A_b(node, grad, hessian)

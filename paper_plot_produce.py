@@ -1,6 +1,6 @@
 #%%
 import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 import torch
 torch.set_default_dtype(torch.float64)
 import numpy as np
@@ -603,12 +603,12 @@ if __name__ == "__main__":
         return df
 
     parameters = [
-        {'degree': 3, 'max_degree': 8, 'd': 1, 'rank': 6, 'cpd_rank': 100},
-        {'degree': 3, 'max_degree': 8, 'd': 3, 'rank': 12, 'cpd_rank': 100},
+        # {'degree': 3, 'max_degree': 8, 'd': 1, 'rank': 6, 'cpd_rank': 100},
+        # {'degree': 3, 'max_degree': 8, 'd': 3, 'rank': 12, 'cpd_rank': 100},
         {'degree': 3, 'max_degree': 8, 'd': 7, 'rank': 24, 'cpd_rank': 100},
-        {'degree': 5, 'max_degree': 10, 'd': 1, 'rank': 12, 'cpd_rank': 100},
+        # {'degree': 5, 'max_degree': 10, 'd': 1, 'rank': 12, 'cpd_rank': 100},
         {'degree': 5, 'max_degree': 10, 'd': 3, 'rank': 24, 'cpd_rank': 100},
-        {'degree': 5, 'max_degree': 10, 'd': 7, 'rank': 38, 'cpd_rank': 100},
+        # {'degree': 5, 'max_degree': 10, 'd': 7, 'rank': 38, 'cpd_rank': 100},
     ]
     all_dfs = []
     for params in parameters:
@@ -624,4 +624,4 @@ if __name__ == "__main__":
         df['max_degree'] = params['max_degree']
         all_dfs.append(df)
         # Save to csv
-        df.to_csv(f"results_d{params['d']}_deg{params['degree']}_rank{params['rank']}_cpdrank{params['cpd_rank']}.csv", index=False)
+        df.to_csv(f"results_d{params['d']}_deg{params['degree']}_rank{params['rank']}_cpdrank{params['cpd_rank']}_r2.csv", index=False)

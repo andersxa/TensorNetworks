@@ -1,7 +1,14 @@
 #%%
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+from tensor.layers import TensorConvolutionTrainLayer, TensorNetworkLayer
+from tensor.network import SumOfNetworks
+from tensor.bregman import XEAutogradBregman
+from sklearn.metrics import accuracy_score
+from matplotlib import pyplot as plt
+from tensor.utils import visualize_tensornetwork
 import numpy as np
+import pandas as pd
+import os
+# os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 import torch
 import torchvision
 import torchvision.transforms as transforms
@@ -28,8 +35,18 @@ for images, labels in train_loader:
 xinp_train = torch.cat(train_samples, dim=0).cuda()
 y_train = torch.cat(train_labels, dim=0).cuda()
 
-KERNEL_SIZE = 8
-STRIDE = 8
+KERNEL_SIZE = 4
+STRIDE = 4
+num_swipes =5
+N = 2
+r = [1, 3, 3, 3, 3]
+CB = [1,3, 3, 3, 3]
+eps = 5.0
+bsize = 2**9
+print("batch:", bsize, "rankR:", r, "rankC:", CB)
+epsdecay = 1e-1
+method = 'ridge_cholesky'
+lr = 1
 
 # Preprocess the training data
 xinp_train = F.unfold(xinp_train, kernel_size=(KERNEL_SIZE,KERNEL_SIZE), stride=(STRIDE,STRIDE), padding=0).transpose(-2, -1)
@@ -72,20 +89,6 @@ xinp_test = torch.cat((xinp_test, torch.zeros((xinp_test.shape[0], xinp_test.sha
 xinp_test[..., -1, -1] = 1.0
 y_test = F.one_hot(y_test, num_classes=10).to(dtype=torch.float64)
 
-
-# %%
-from tensor.layers import TensorConvolutionTrainLayer, TensorNetworkLayer
-from tensor.network import SumOfNetworks
-from tensor.bregman import XEAutogradBregman
-from sklearn.metrics import accuracy_score
-import numpy as np
-from matplotlib import pyplot as plt
-
-num_swipes = 3
-
-N = 4
-r = 12
-CB = -1
 trajectory = []
 epoch = 0
 def convergence_criterion():
@@ -110,17 +113,16 @@ for i in range(1, N+1):
     else:
         num_patches = xinp_train.shape[1] - 1
         patch_pixels = xinp_train.shape[2] - 1
-    net = TensorConvolutionTrainLayer(num_carriages=i, bond_dim=r, num_patches=num_patches, patch_pixels=patch_pixels, output_shape=y_train.shape[1]-1, convolution_bond=CB).tensor_network
+    net = TensorConvolutionTrainLayer(num_carriages=i, bond_dim=r[i-1], num_patches=num_patches, patch_pixels=patch_pixels, output_shape=y_train.shape[1]-1, convolution_bond=CB[i-1]).tensor_network
     nets.append(net)
 layer = TensorNetworkLayer(
     SumOfNetworks(
         nets,
         train_operators=True
     )
-).cuda()
+).cuda(-1)
 print('Num params:', layer.num_parameters())
 #%%
-from tensor.utils import visualize_tensornetwork
 visualize_tensornetwork(layer.tensor_network)
 #%%
 with torch.inference_mode():
@@ -128,15 +130,21 @@ with torch.inference_mode():
     w = 1/y_pred.std().item()
     #del y_pred
 bf = XEAutogradBregman(w=w)
+# layer.tensor_network.forward = torch.compile(layer.tensor_network.forward)
 #%%
-layer.tensor_network.accumulating_swipe(xinp_train, y_train, bf, eps=1.0, eps_decay=0.5, batch_size=2048, lr=1.0, convergence_criterion=convergence_criterion, orthonormalize=False, method='ridge_exact', verbose=2, num_swipes=num_swipes)
+layer.tensor_network.accumulating_swipe(xinp_train, y_train, bf, eps=eps, eps_decay=epsdecay, batch_size=bsize, lr=lr, convergence_criterion=convergence_criterion, orthonormalize=False, method=method, verbose=2, num_swipes=num_swipes)
 #%%
-import numpy as np
-import pandas as pd
+
 data = []
 for traj in trajectory:
-    data.append((traj['epoch'], traj['val_accuracy']))
-
-df = pd.DataFrame(data, columns=['Epoch', 'Val Accuracy'])
-df.to_csv(f'tt_convolution_N{N}_r{r}_cb{CB}_swipes{num_swipes}_P{layer.num_parameters()}_fit_mnist.csv', index=False)
+      data.append((traj['epoch'], traj['val_accuracy']))
+val_acc = [i[1] for i in data]
+print('==========================================================================')
+print('==========================================================================')
+print("Best:", max(val_acc))
+print("batch:", bsize, "rankR:", r, "rankC:", CB)
+print('==========================================================================')
+print('==========================================================================')
+# df = pd.DataFrame(data, columns=['Epoch', 'Val Accuracy'])
+# df.to_csv(f'tt_convolution_N{N}_r{r}_cb{CB}_swipes{num_swipes}_P{layer.num_parameters()}_fit_mnist.csv', index=False)
 # %%

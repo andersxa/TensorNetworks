@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 import argparse
 import torch
 import torchvision
@@ -14,7 +15,7 @@ from tensor.bregman import XEAutogradBregman
 from models.tensor_train import EarlyStopping
 
 # This should be set before any torch imports that might initialize CUDA
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 torch.set_default_dtype(torch.float64)
 
 
@@ -155,6 +156,7 @@ def train_model(args):
         'r': args.r,
         'CB': args.CB,
         'test_accuracy': accuracy_test * 100,
+        'num_parameters': layer.num_parameters()
         'num_swipes': args.num_swipes,
         'eps': args.eps,
         'eps_decay': args.eps_decay,

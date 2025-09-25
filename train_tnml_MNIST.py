@@ -149,7 +149,8 @@ def train_model(args, data=None, test=False):
         verbose=args.verbose,
         early_stopping=args.early_stopping if args.early_stopping > 0 else None,
         basis='polynomial' if 'poly' in args.model_type else 'sin-cos',
-        degree=args.degree
+        degree=args.degree,
+        constrict_bond=True
     )
     # Add num parameters to config
     model.fit(X_train, y_train, X_val, y_val)
@@ -199,16 +200,18 @@ if __name__ == '__main__':
     args.dataset_name = 'mnist'  # Change to 'fashionmnist' to use FashionMNIST
     args.data_path = "/work3/aveno/MNIST/data"  # Specify path to data
 
-    rs = [8]
+    rs = [int(os.getenv("R", "4"))]
+    args.model_type = os.getenv("MT", "sin-cos")
     poly_degrees = [3] #[1,2,3,4,5,6]
-    args.num_swipes = 100
+    args.num_swipes = 1
     args.lr = 1.0
-    args.eps_start = 15.0
-    args.eps_decay = 0.25
-    args.batch_size = 2048
-    args.verbose = 1
+    args.eps_start = float(os.getenv("ES", 150.0))
+    args.eps_decay = float(os.getenv("ED", 0.01))
+    args.batch_size = int(os.getenv("BS", 2048*32*16))
+    args.verbose = 2
     args.method = 'ridge_cholesky'
     args.lin_dim = None
+    basis = os.getenv("MT", None)
 
     # Load data once
     data = get_image_data(dataset_name=args.dataset_name, data_path=args.data_path, device=args.data_device)
@@ -216,7 +219,7 @@ if __name__ == '__main__':
     args.early_stopping = max(10, num_features+1)
 
     seeds = list(range(42, 42+5))
-    for basis_func in ['sin-cos']: #,'polynomial'
+    for basis_func in [basis]: #,'polynomial'
         is_poly = basis_func == 'polynomial'
         degrees = poly_degrees if is_poly else [np.nan]
         args.model_type = f'tnml_{basis_func}'
@@ -234,22 +237,22 @@ if __name__ == '__main__':
             for degree in degrees:
                 for r in rs:
                     for seed in seeds:
-                        try:
-                            args.N = degree if is_poly else np.nan
-                            args.degree = degree
-                            args.r = r
-                            args.seed = seed
-                            print(f"Training {args.dataset_name} with r={r}, basis={basis_func}, degree={degree} and early_stopping={args.early_stopping}", file=sys.stdout, flush=True)
-                            result = train_model(args, data=data, test=False)
-                            results.append((args.dataset_name, args.degree, args.r, np.nan, result['val_rmse'], result['val_r2'], result['val_accuracy'], result['num_params'], result['converged_epoch'], seed))
-                            print(f"Result: {result}", file=sys.stdout, flush=True)
-                        except KeyboardInterrupt:
-                            print("Interrupted by user, exiting...", file=sys.stdout, flush=True)
-                            exit(0)
-                        except:
-                            print("Failed, skipping...", file=sys.stdout, flush=True)
-                            torch.cuda.empty_cache()
-                            continue
+                        # try:
+                        args.N = degree if is_poly else np.nan
+                        args.degree = degree
+                        args.r = r
+                        args.seed = seed
+                        print(f"Training {args.dataset_name} with r={r}, basis={basis_func}, degree={degree} and early_stopping={args.early_stopping}", file=sys.stdout, flush=True)
+                        result = train_model(args, data=data, test=False)
+                        results.append((args.dataset_name, args.degree, args.r, np.nan, result['val_rmse'], result['val_r2'], result['val_accuracy'], result['num_params'], result['converged_epoch'], seed))
+                        print(f"Result: {result}", file=sys.stdout, flush=True)
+                        # except KeyboardInterrupt:
+                        #     print("Interrupted by user, exiting...", file=sys.stdout, flush=True)
+                        #     exit(0)
+                        # except:
+                        #     print("Failed, skipping...", file=sys.stdout, flush=True)
+                        #     torch.cuda.empty_cache()
+                        #     continue
 
             df = pd.DataFrame(results, columns=['dataset', 'N', 'r', 'lin_dim', 'val_rmse', 'val_r2', 'val_accuracy', 'num_params', 'converged_epoch', 'seed'])
             df['num_swipes'] = args.num_swipes

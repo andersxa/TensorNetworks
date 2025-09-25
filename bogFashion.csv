@@ -1,0 +1,6 @@
+dataset,model_type,N,r,CB,test_accuracy,num_parameters,num_swipes,eps,eps_decay,kernel_size,kernel_stride,early_stopping,abs_err,rel_err,seed,validation_split,timestamp
+FashionMNIST,tt_type1,4,16,8,88.83,65459,5,5.0,0.25,4,4,10,0.0001,0.001,42,0.1,2025-09-22T14:58:01.235180
+FashionMNIST,tt_type1,4,16,8,88.04,65459,5,5.0,0.25,4,4,10,0.0001,0.001,43,0.1,2025-09-22T15:04:26.770618
+FashionMNIST,tt_type1,4,16,8,88.3,65459,5,5.0,0.25,4,4,10,0.0001,0.001,44,0.1,2025-09-22T15:13:07.503691
+FashionMNIST,tt_type1,4,16,8,88.06,65459,5,5.0,0.25,4,4,10,0.0001,0.001,45,0.1,2025-09-22T15:22:41.177656
+FashionMNIST,tt_type1,4,16,8,88.67,65459,5,5.0,0.25,4,4,25,0.0001,0.001,46,0.1,2025-09-22T16:21:42.863974
